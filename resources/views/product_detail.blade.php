@@ -15,7 +15,7 @@
   {{$products->itemref}}
 @endsection
 @section('main-content')
-<div class="row">
+<div class="row" style="font-family: 'Times New Roman'">
     
   <?php
   $showprice = false;
@@ -54,7 +54,7 @@
       </div>
     </div>
     <div class="col-md-6">
-      <p><strong>{{ GoogleTranslate::trans('PO:', app()->getLocale()) }}</strong> <?php echo $products->po; ?></p>
+      <p><strong>PO:</strong> <?php echo $products->po; ?></p>
       <p><strong>{{ GoogleTranslate::trans('Item Reference:', app()->getLocale()) }}</strong> <?php echo $products->itemref; ?></p>
       <p><strong>{{ GoogleTranslate::trans('Company:', app()->getLocale()) }}</strong> <?php echo $products->company; ?></p>
       @foreach ($priceaccesslists as $priceaccesslist)

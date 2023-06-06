@@ -83,6 +83,7 @@ Route::group(['middleware'=>['AuthCheck']], function(){
                 Route::post('/storeupdateproduct',[ProductController::class, 'storeupdateproducts'])->name('storeupdateproduct');
                 Route::get('/trashproduct', [ProductController::class, 'trashproduct'])->name('trashproduct');
                 Route::match(['get','post'],'/trashproducts', [ProductController::class, 'trash'])->name('trashproducts');
+                Route::match(['get','post'],'/trashproductaction', [ProductController::class, 'trashaction'])->name('trashproductaction');
                 Route::match(['get','post'],'/restoreproduct', [ProductController::class, 'restoreproduct'])->name('restoreproduct');
                 Route::match(['get','post'],'/deleteproduct',[ProductController::class, 'deleteproduct'])->name('deleteproduct');
                 Route::get('/addcompany',[AdminController::class, 'addcompany'])->name('addcompany');

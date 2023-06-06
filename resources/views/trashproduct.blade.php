@@ -41,9 +41,25 @@
       </div>
       <!-- /.card-header -->
       <div class="card-body">
+        <form method="post" class="form-group" id="trashform" action="{{route('trashproductaction')}}">
+          @csrf
+          <div class="row">
+            <div class="col-sm-2">
+              <div class="input-group">
+                <select class="form-control" name="action" aria-placeholder="Bulk Action">
+                  <option value="" disabled selected hidden>Bulk Action</option>
+                  <option value="restoreproduct" >Restore</option>
+                  <option value="deleteproduct" >Permanently Delete</option>
+                      
+                </select>
+                <button type="submit" class="btn btn-outline-dark ml-1">{{ GoogleTranslate::trans('Apply', app()->getLocale()) }}</button>
+              </div>
+            </div>
+          </div>
         <table id="example1" class="table table-bordered table-striped">
           <thead>
           <tr>
+            <th><input type="checkbox" id="select-all"></th>
             <th>{{ GoogleTranslate::trans('Image', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Purchase Order', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Item Reference', app()->getLocale()) }}</th>
@@ -72,6 +88,7 @@
                 $first_image = $image_array[0];
               ?>
               <tr>
+                <td><input type="checkbox" value="{{$product->id}}" name="checkbox[]"></td>
                 <td><img src="{{asset('storage/product_images/'.$first_image)}}" alt="<?php echo $first_image;?>" style="height: 100px"></td>
                 <td><?php echo $product->po; ?></td>
                 <td><?php echo $product->itemref; ?></td>
@@ -84,101 +101,15 @@
                   <a href="{{route('product_detail',['id'=>$product->id,'trash'=>$product->company])}}" class="btn btn-light">
                     <i class="fas fa-eye"></i> {{ GoogleTranslate::trans('View', app()->getLocale()) }}
                   </a>
-                  <form action="{{route('restoreproduct')}}" method="post">
-                    @csrf
-                    <input type="hidden" name="id" value="{{$product->id}}">
-                    <button class="btn btn-light mr-2"><i class="fa fa-check"></i> {{ GoogleTranslate::trans('Restore', app()->getLocale()) }}</button>
-                </form>
-                  
-                  @if ($userrole=='admin1')
-                  <button type="button" class="btn btn-light" data-toggle="modal" data-target="#myModal2<?php echo $product->id; ?>">
-                    <i class="fas fa-trash"></i> {{ GoogleTranslate::trans('Permanently Delete', app()->getLocale()) }}
-                  </button>  
-                  @endif
                 </td>
               </tr>
         
-              <!-- Modal -->
-              <div class="modal fade" id="myModal<?php echo $product->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                <div class="modal-dialog modal-xl" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h4 class="modal-title" id="myModalLabel">Product Information</h4>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <div class="row">
-                        <div class="col-6">
-                          <?php
-                            $productimages = $product->images;
-                            $imageNames = [];
-                            foreach (explode(",",$productimages) as $value) {
-                              $imageNames[] = $value;
-                            }
-                            // Sort the array of image names
-                            sort($imageNames);
-      
-                            // Loop through the sorted array and output the image names
-                            foreach ($imageNames as $i => $image) { ?> 
-                              @if ($i==0)
-                              <img src="{{asset('storage/product_images/'.$image)}}" alt="<?php echo $image;?>" class="mt-2 border img-fluid h-25">
-                              @else
-                              <img src="{{asset('storage/product_images/'.$image)}}" alt="<?php echo $image;?>" class="mt-2 border img-fluid w-50">
-                              @endif
-                            <?php }
-                          ?>
-                        </div>
-                        <div class="col-6">
-                          <p><strong>PO:</strong> <?php echo $product->po; ?></p>
-                          <p><strong>Item Reference:</strong> <?php echo $product->itemref; ?></p>
-                          <p><strong>Company:</strong> <?php echo $product->company; ?></p>
-                          <p><strong>Description:</strong> <?php echo $product->description; ?></p>
-                          <!-- Add additional product information here -->
-                          @if (!empty($product->file))
-                          <a href="{{asset('storage/product_files/'.$product->file)}}" class="btn btn-primary" download="{{$product->file}}"><i class="fa fa-download"></i> Download</a> 
-                          @endif
-                          
-                        </div>
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Modal -->
-              <div class="modal fade" id="myModal2<?php echo $product->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                <div class="modal-dialog modal-m" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header bg-warning">
-                      <h4 class="modal-title" id="myModalLabel"><i class="fas fa-exclamation-triangle"></i> Warning!</h4>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <h5>{{ GoogleTranslate::trans('Are you sure to delete this product permanently?', app()->getLocale()) }}</h5>
-                      <form action="{{route('deleteproduct')}}" method="post">
-                        @csrf
-                        <input type="hidden" name="id" value="{{$product->id}}">
-                        <input type="hidden" name="company" value="{{$product->company}}">
-                        <button type="submit" class="btn btn-outline-dark"><i class="fas fa-trash"></i> {{ GoogleTranslate::trans('Permanently Delete', app()->getLocale()) }}</button>
-                      </form>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-default" data-dismiss="modal">{{ GoogleTranslate::trans('Close', app()->getLocale()) }}</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
             <?php } ?>
           
           </tbody>
           <tfoot>
           <tr>
+            <th></th>
             <th>{{ GoogleTranslate::trans('Image', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Purchase Order', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Item Reference', app()->getLocale()) }}</th>
@@ -191,6 +122,7 @@
           </tr>
           </tfoot>
         </table>
+      </form>
       </div>
       <!-- /.card-body -->
     </div>
@@ -229,4 +161,22 @@
       });
     });
 </script>
+<script type="text/javascript">  
+  // Add this code in a script tag or external JavaScript file
+
+  // Get the "Select All" checkbox element
+  const selectAllCheckbox = document.getElementById('select-all');
+
+  // Get all the checkboxes within the form
+  const checkboxes = document.querySelectorAll('#trashform input[type="checkbox"]');
+
+  // Add event listener to the "Select All" checkbox
+  selectAllCheckbox.addEventListener('change', function () {
+      // Loop through all the checkboxes
+      checkboxes.forEach(function (checkbox) {
+          // Check/uncheck each checkbox based on the state of the "Select All" checkbox
+          checkbox.checked = selectAllCheckbox.checked;
+      });
+  });           
+</script> 
 @endsection

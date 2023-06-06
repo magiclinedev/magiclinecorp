@@ -35,7 +35,29 @@
       <!-- /.card-header -->
       <div class="card-body">
         <div class="row">
+            <?php
+            $CurrentUser = session()->get('LoggedUser');
+            $checkrole = DB::table('users')->where('id','=',$CurrentUser)->get();
+            $producttrash = DB::select('select * from products where archived = 1');
+            $showprice = false;
+            $checkrole = DB::select('select * from users where id = ?', [session()->get('LoggedUser')]);
+            foreach ($products as $product) {
+              $priceaccesslists = DB::select('select * from prices where itemref = ?', [$product->itemref]);
+            }
+            
+            foreach ($checkrole as $role) {
+              $userrole = $role->role;
+            }
+          ?>
+          <div>
+            @if ($userrole=='admin1'||$userrole=='owner')
+            <button type="button" class="btn btn-outline-dark mr-1" data-toggle="modal" data-target="#myModal2">
+              <i class="fas fa-trash"></i> {{ GoogleTranslate::trans('Move to Trash', app()->getLocale()) }}
+            </button>  
+            @endif
+          </div>
           <div class="col-sm-3">
+            
             <form method="get" class="form-group" action="{{url('admin/partnerproduct/'.$company)}}">
               <div class="input-group">
                 <select class="form-control" name="categ_filter" aria-placeholder="Category">
@@ -50,22 +72,10 @@
                 <a href="{{url('admin/partnerproduct/'.$company)}}" class="btn btn-outline-dark ml-2">{{ GoogleTranslate::trans('Show All', app()->getLocale()) }}</a>
               </div>
             </form>
-            
           </div>
           <div class="col-sm-3">
             <a href="{{route('addproduct',['company'=>$company])}}" class="btn btn-light"><i class="fas fa-file-upload"></i><span class="ml-2">{{ GoogleTranslate::trans('Add Product', app()->getLocale()) }}</span></a>
-            <?php
-              $producttrash = DB::select('select * from products where archived = 1');
-              $showprice = false;
-              $checkrole = DB::select('select * from users where id = ?', [session()->get('LoggedUser')]);
-              foreach ($products as $product) {
-                $priceaccesslists = DB::select('select * from prices where itemref = ?', [$product->itemref]);
-              }
-              
-              foreach ($checkrole as $role) {
-                $userrole = $role->role;
-              }
-            ?>
+            
             @if ($userrole=='admin1'||$userrole=='owner')
             <a href="{{route('trashproduct',['company'=>$company])}}" class="btn btn-light"><i class="fas fa-trash"></i> {{ GoogleTranslate::trans('Trash', app()->getLocale()) }}
               <span class="right badge badge-danger">{{count($producttrash)}}</span>
@@ -74,10 +84,12 @@
             
           </div>
         </div>
-
+        <form action="{{route('trashproducts')}}" id="productform" method="post">
+          @csrf
         <table id="example1" class="table table-bordered table-striped">
           <thead>
           <tr>
+            <th><input type="checkbox" id="select-all"></th>
             <th>{{ GoogleTranslate::trans('Image', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Purchase Order', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Item Reference', app()->getLocale()) }}</th>
@@ -91,11 +103,7 @@
           <tbody>
       <?php 
         
-        $CurrentUser = session()->get('LoggedUser');
-        $checkrole = DB::table('users')->where('id','=',$CurrentUser)->get();
-        foreach ($checkrole as $check) {
-          $userrole = $check->role;
-        }
+        
         foreach ($products as $product) {
           $image_array = [];
           foreach (explode(",",$product->images) as $value) {
@@ -105,6 +113,7 @@
           $first_image = $image_array[0];
         ?>
         <tr>
+          <td><input type="checkbox" value="{{$product->id}}" name="checkbox[]"></td>
           <td>
             <a href="{{asset('storage/product_images/'.$first_image)}}" data-toggle="lightbox" data-title="<?php echo $product->itemref;?>" data-gallery="product">
               <img src="{{asset('storage/product_images/'.$first_image)}}" alt="<?php echo $first_image;?>" style="height: 100px">
@@ -121,64 +130,19 @@
               <i class="fas fa-eye"></i> {{ GoogleTranslate::trans('View', app()->getLocale()) }}
             </a>
             <a href="{{route('editproduct',$product->id)}}" class="btn btn-light"><i class="fa fa-edit"></i> {{ GoogleTranslate::trans('Edit', app()->getLocale()) }}</a>
-            @if ($userrole=='admin1')
-            <button type="button" class="btn btn-light" data-toggle="modal" data-target="#myModal2<?php echo $product->id; ?>">
-              <i class="fas fa-trash"></i> {{ GoogleTranslate::trans('Delete', app()->getLocale()) }}
-            </button>  
-            @endif
+            
           </td>
         </tr>
   
-        <!-- Modal -->
-        <div class="modal fade" id="myModal<?php echo $product->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-          <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">Product Information</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                
-              </div><!-- 
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-              </div> -->
-            </div>
-          </div>
-        </div>
-        <!-- Modal -->
-        <div class="modal fade" id="myModal2<?php echo $product->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-          <div class="modal-dialog modal-m" role="document">
-            <div class="modal-content">
-              <div class="modal-header bg-warning">
-                <h4 class="modal-title" id="myModalLabel"><i class="fas fa-exclamation-triangle"></i> {{ GoogleTranslate::trans('Warning!', app()->getLocale()) }}</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <h5>{{ GoogleTranslate::trans('Are you sure to delete this product?', app()->getLocale()) }}</h5>
-                <form action="{{route('trashproducts')}}" method="post">
-                  @csrf
-                  <input type="hidden" name="id" value="{{$product->id}}">
-                  <input type="hidden" name="company" value="{{$product->company}}">
-                  <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i>  {{ GoogleTranslate::trans('Delete', app()->getLocale()) }}</button>
-                </form>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{{ GoogleTranslate::trans('Close', app()->getLocale()) }}</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        
+        
       <?php } ?>
           
           
           </tbody>
           <tfoot>
           <tr>
+            <th></th>
             <th>{{ GoogleTranslate::trans('Image', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Purchase Order', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Item Reference', app()->getLocale()) }}</th>
@@ -190,6 +154,27 @@
           </tr>
           </tfoot>
         </table>
+        <!-- Modal -->
+        <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog modal-m" role="document">
+            <div class="modal-content">
+              <div class="modal-header bg-warning">
+                <h4 class="modal-title" id="myModalLabel"><i class="fas fa-exclamation-triangle"></i> {{ GoogleTranslate::trans('Warning!', app()->getLocale()) }}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <h5>{{ GoogleTranslate::trans('Are you sure to delete this product?', app()->getLocale()) }}</h5>
+                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i>  {{ GoogleTranslate::trans('Delete', app()->getLocale()) }}</button>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{ GoogleTranslate::trans('Close', app()->getLocale()) }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
       </div>
       <!-- /.card-body -->
     </div>
@@ -253,4 +238,22 @@
     });
   })
 </script>
+<script type="text/javascript">  
+  // Add this code in a script tag or external JavaScript file
+
+  // Get the "Select All" checkbox element
+  const selectAllCheckbox = document.getElementById('select-all');
+
+  // Get all the checkboxes within the form
+  const checkboxes = document.querySelectorAll('#productform input[type="checkbox"]');
+
+  // Add event listener to the "Select All" checkbox
+  selectAllCheckbox.addEventListener('change', function () {
+      // Loop through all the checkboxes
+      checkboxes.forEach(function (checkbox) {
+          // Check/uncheck each checkbox based on the state of the "Select All" checkbox
+          checkbox.checked = selectAllCheckbox.checked;
+      });
+  });           
+</script> 
 @endsection

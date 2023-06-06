@@ -147,7 +147,7 @@
               <span class="text-danger">@error('images'){{ $message }}@enderror</span>
           </div>
           <div class="form-group">
-              <label for="costing">{{ GoogleTranslate::trans('Costing:', app()->getLocale()) }}</label> <span class="text-muted">({{ GoogleTranslate::trans('optional:', app()->getLocale()) }})</span>
+              <label for="costing">{{ GoogleTranslate::trans('Costing:', app()->getLocale()) }}</label> <span class="text-muted">({{ GoogleTranslate::trans('optional', app()->getLocale()) }})</span>
               @if (!empty($product->file))
               <a href="{{asset('storage/product_files/'.$product->file)}}"  download="{{$product->file}}">{{$product->file}}</a> 
               @endif

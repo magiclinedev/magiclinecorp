@@ -283,12 +283,12 @@
                 <li class="nav-item">
                   <a href="{{route('products')}}" class="nav-link">
                     <i class="fa fa-briefcase"></i>
-                    <p>All Products</p>
+                    <p>{{ GoogleTranslate::trans('All Products', app()->getLocale()) }}</p>
                   </a>
                 </li>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="" class="nav-link">
                   <i class="nav-icon fa fa-users"></i>
                   <p>
                     {{ GoogleTranslate::trans('List of Partners', app()->getLocale()) }}

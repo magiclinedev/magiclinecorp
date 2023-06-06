@@ -58,7 +58,7 @@ class ProductController extends Controller
         return back();
        }
     }
-    public function store(Request $request)
+    function store(Request $request)
     {
         $validatedData = Validator::make($request->all(),[
             'po' => 'nullable|unique:products',
@@ -172,14 +172,16 @@ class ProductController extends Controller
                 }
                 return back()->with('fail','PO is already taken by other product');
             }
-        } elseif ($request->id != $check_id2) {
+        }
+        if ($request->id != $check_id2) {
             foreach ($temporaryImages as $temporaryImage) {
                 Storage::deleteDirectory('public/tmp/' . $temporaryImage->folder);
                 $temporaryImage->delete();
             }
             return back()->with('fail','Item Reference is already taken by other product');
-        } else {
-        $LoggedUser = session()->get('LoggedUser');
+        } 
+        else {
+            $LoggedUser = session()->get('LoggedUser');
         $userdata = User::find($LoggedUser);
         $images = [];
 
@@ -306,14 +308,34 @@ class ProductController extends Controller
         }
     }
     function trash(Request $request){
-        if(isset($request->id)){
-            $product = Product::whereId($request->id)->update([
-                'archived' => 1,
-            ]);
-            return redirect('/admin/partnerproduct/'.strtolower($request->company))->with('deleted','Product transfered to trash successfully!!');
+        if (isset($request->checkbox)) {
+            foreach ($request->checkbox as $key => $id) {
+                $product = Product::whereId($id)->update([
+                    'archived' => 1,
+                ]);
+            }
+            return redirect('/admin/partnerproduct/'.strtolower($request->company))->with('deleted','Product(s) transfered to trash successfully!!');
         } else {
             return back();
         }
+    }
+    function trashaction(Request $request){
+        if ($request->action == 'restoreproduct') {
+            foreach ($request->checkbox as $key => $product_id) {
+                $product = Product::whereId($product_id)->update([
+                    'archived' => null,
+                ]);
+            }
+            return redirect('/admin/trashproduct')->with('success','Product restored sucessfully!');
+        } elseif ($request->action == 'deleteproduct') {
+            foreach ($request->checkbox as $key => $product_id) {
+                $product = Product::find($product_id)->delete();
+            }
+            return redirect('/admin/trashproduct')->with('deleted','Product permanently deleted successfuly!');
+        } else {
+            return back();
+        }
+        
     }
     function restoreproduct(Request $request){
         if(isset($request->id)){
@@ -337,7 +359,7 @@ class ProductController extends Controller
             return back();
         }
     }
-    public function tmpUpload(Request $request){
+    function tmpUpload(Request $request){
         if ($request->hasFile('images')) {
             $folder = uniqid('product',true);
             $images = $request->file('images');
@@ -352,7 +374,7 @@ class ProductController extends Controller
         return '';
         
     }
-    public function tmpDelete(Request $request){
+    function tmpDelete(Request $request){
         $temporaryImage = TemporaryFile::where('folder', request()->getContent())->first();
         if ($temporaryImage) {
             Storage::deleteDirectory('public/tmp/' . $temporaryImage->folder);
