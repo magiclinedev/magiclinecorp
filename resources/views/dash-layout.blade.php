@@ -218,7 +218,7 @@
             </a>
           </li>
           @else
-          @if (count($access)>1)
+          @if (count($access)>1 || $access[0]=='ALL')
           <li class="nav-item">
             <a href="{{url('/')}}" class="nav-link">
               <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -269,6 +269,7 @@
           @php
             $companylists = DB::select('select * from partners where archived is null order by company asc');
           @endphp
+          @if ( $user_role=='owner' || $user_role=='admin1')
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-store"></i>
@@ -278,96 +279,12 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
-              @if ($user_role=='admin1' || $user_role=='owner')
+              @if ($user_role=='admin1' ||  $user_role=='owner')
               <li class="nav-item">
-                <li class="nav-item">
-                  <a href="{{route('products')}}" class="nav-link">
-                    <i class="fa fa-briefcase"></i>
-                    <p>{{ GoogleTranslate::trans('All Products', app()->getLocale()) }}</p>
-                  </a>
-                </li>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link">
-                  <i class="nav-icon fa fa-users"></i>
-                  <p>
-                    {{ GoogleTranslate::trans('List of Partners', app()->getLocale()) }}
-                    <i class="fas fa-angle-left right"></i>
-                  </p>
+                <a href="{{route('products')}}" class="nav-link">
+                  <i class="fa fa-briefcase"></i>
+                  <p>{{ GoogleTranslate::trans('All Products', app()->getLocale()) }}</p>
                 </a>
-                <ul class="nav nav-treeview">
-                @foreach ($companylists as $companylist)
-                <li class="nav-item">
-                  <a href="{{route('partnerproduct',strtolower($companylist->company))}}" class="nav-link">
-                    <i class="fa fa-briefcase"></i>
-                    <p>{{$companylist->company}}</p>
-                  </a>
-                </li>
-                @endforeach
-                </ul>
-              </li>
-              @endif
-              @if ($user_role == 'admin2')
-              <?php
-                  $accesslists = DB::table('access_lists')->where('user_id','=',$LoggedUser)->get();
-                  foreach ($accesslists as $accesslist) {
-                    $lists = $accesslist->accesslists;
-                  }
-              ?>
-              @foreach (explode(',',$lists) as $access)
-                @if ($access=='ALL')
-                  <li class="nav-item">
-                    <li class="nav-item">
-                      <a href="{{route('products')}}" class="nav-link">
-                        <i class="fa fa-briefcase"></i>
-                        <p>All Products</p>
-                      </a>
-                    </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon fa fa-users"></i>
-                      <p>
-                        {{ GoogleTranslate::trans('List of Partners', app()->getLocale()) }}
-                        <i class="fas fa-angle-left right"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                    @foreach ($companylists as $companylist)
-                    <li class="nav-item">
-                      <a href="{{route('partnerproduct',strtolower($companylist->company))}}" class="nav-link">
-                        <i class="fa fa-briefcase"></i>
-                        <p>{{$companylist->company}}</p>
-                      </a>
-                    </li>
-                    @endforeach
-                    </ul>
-                  </li>
-                @else
-                <li class="nav-item">
-                  <a href="{{route('partnerproduct',strtolower($access))}}" class="nav-link">
-                    <i class="fa fa-warehouse"></i>
-                    <p>{{$access}}</p>
-                  </a>
-                </li>
-                @endif   
-              @endforeach
-              @elseif ($user_role == 'user')
-              
-              <?php
-                  $accesslists = DB::table('access_lists')->where('user_id','=',$LoggedUser)->get();
-                  foreach ($accesslists as $accesslist) {
-                    $lists = $accesslist->accesslists;
-                  }
-              ?>
-              @foreach (explode(',',$lists) as $access)
-              @if ($access=='ALL')
-              <li class="nav-item">
-                <li class="nav-item">
-                  <a href="{{route('products2')}}" class="nav-link">
-                    <i class="fa fa-briefcase"></i>
-                    <p>All Products</p>
-                  </a>
-                </li>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
@@ -375,30 +292,20 @@
                   <p>
                     {{ GoogleTranslate::trans('List of Partners', app()->getLocale()) }}
                     <i class="fas fa-angle-left right"></i>
+                    <span class="badge badge-info right">{{count($companylists)}}</span>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
-                @foreach ($companylists as $companylist)
-                <li class="nav-item">
-                  <a href="{{route('partnerproduct',strtolower($companylist->company))}}" class="nav-link">
-                    <i class="fa fa-briefcase"></i>
-                    <p>{{$companylist->company}}</p>
-                  </a>
-                </li>
-                @endforeach
+                  @foreach ($companylists as $companylist)
+                  <li class="nav-item">
+                    <a href="{{route('partnerproduct',strtolower($companylist->company))}}" class="nav-link">
+                      <i class="fa fa-briefcase"></i>
+                      <p>{{$companylist->company}}</p>
+                    </a>
+                  </li>
+                  @endforeach
                 </ul>
               </li>
-              @else
-              <li class="nav-item">
-                <a href="{{route('company',strtolower($access))}}" class="nav-link">
-                  <i class="fa fa-warehouse"></i>
-                  <p>{{$access}}</p>
-                </a>
-              </li>
-              @endif   
-              @endforeach
-              @endif
-              @if ( $user_role=='owner' || $user_role == 'admin1' || $user_role == 'admin2')
               <li class="nav-item">
                 <a href="{{route('addproduct')}}" class="nav-link">
                   <i class="nav-icon fas fa-file-upload"></i>
@@ -406,8 +313,135 @@
                     {{ GoogleTranslate::trans('Add New Product', app()->getLocale()) }}
                   </p>
                 </a>
-              </li>  
-              @endif
+              </li>
+            @endif
+            </ul>
+          </li>
+          @endif
+          <?php
+              $accesslists = DB::table('access_lists')->where('user_id','=',$LoggedUser)->get();
+              foreach ($accesslists as $accesslist) {
+                $lists = $accesslist->accesslists;
+              }
+          ?>
+          @if ($user_role == 'admin2')
+          
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-store"></i>
+              <p>
+                {{ GoogleTranslate::trans('Products', app()->getLocale()) }}
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              @foreach (explode(',',$lists) as $access)
+              @if ($access=='ALL')
+              <li class="nav-item">
+                <a href="{{route('products')}}" class="nav-link">
+                  <i class="fa fa-briefcase"></i>
+                  <p>{{ GoogleTranslate::trans('All Products', app()->getLocale()) }}</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon fa fa-users"></i>
+                  <p>
+                    {{ GoogleTranslate::trans('List of Partners', app()->getLocale()) }}
+                    <i class="fas fa-angle-left right"></i>
+                    <span class="badge badge-info right">{{count($companylists)}}</span>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  @foreach ($companylists as $companylist)
+                  <li class="nav-item">
+                    <a href="{{route('partnerproduct',strtolower($companylist->company))}}" class="nav-link">
+                      <i class="fa fa-briefcase"></i>
+                      <p>{{$companylist->company}}</p>
+                    </a>
+                  </li>
+                  @endforeach
+                </ul>
+              </li>
+              @else
+              <li class="nav-item">
+                <a href="{{route('partnerproduct',strtolower($access))}}" class="nav-link">
+                  <i class="fa fa-warehouse"></i>
+                  <p>{{$access}}</p>
+                </a>
+              </li>
+              @endif   
+            @endforeach
+            <li class="nav-item">
+              <a href="{{route('addproduct')}}" class="nav-link">
+                <i class="nav-icon fas fa-file-upload"></i>
+                <p>
+                  {{ GoogleTranslate::trans('Add New Product', app()->getLocale()) }}
+                </p>
+              </a>
+            </li>
+            </ul>
+          </li>
+          @elseif ($user_role == 'user')
+          
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-store"></i>
+              <p>
+                {{ GoogleTranslate::trans('Products', app()->getLocale()) }}
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              @foreach (explode(',',$lists) as $access)
+              @if ($access=='ALL')
+              <li class="nav-item">
+                <a href="{{route('products2')}}" class="nav-link">
+                  <i class="fa fa-briefcase"></i>
+                  <p>{{ GoogleTranslate::trans('All Products', app()->getLocale()) }}</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon fa fa-users"></i>
+                  <p>
+                    {{ GoogleTranslate::trans('List of Partners', app()->getLocale()) }}
+                    <i class="fas fa-angle-left right"></i>
+                    <span class="badge badge-info right">{{count($companylists)}}</span>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  @foreach ($companylists as $companylist)
+                  <li class="nav-item">
+                    <a href="{{route('partnerproduct',strtolower($companylist->company))}}" class="nav-link">
+                      <i class="fa fa-briefcase"></i>
+                      <p>{{$companylist->company}}</p>
+                    </a>
+                  </li>
+                  @endforeach
+                </ul>
+              </li>
+              @else
+              <li class="nav-item">
+                <a href="{{route('partnerproduct',strtolower($access))}}" class="nav-link">
+                  <i class="fa fa-warehouse"></i>
+                  <p>{{$access}}</p>
+                </a>
+              </li>
+              @endif   
+            @endforeach
+          @endif
+          @if ( $user_role=='owner' || $user_role == 'admin1' || $user_role == 'admin2')
+          
+          <li class="nav-item">
+            <a href="{{route('addproduct')}}" class="nav-link">
+              <i class="nav-icon fas fa-file-upload"></i>
+              <p>
+                {{ GoogleTranslate::trans('Add New Product', app()->getLocale()) }}
+              </p>
+            </a>
+          </li>
+          @endif
               
             </ul>
           </li>

@@ -255,32 +255,31 @@
                 $companylists = DB::select('select * from partners where archived is null order by company asc');
               @endphp
               <li class="nav-item">
-                <li class="nav-item">
-                  <a href="{{route('products')}}" class="nav-link">
-                    <i class="fa fa-briefcase"></i>
-                    <p>{{ GoogleTranslate::trans('All Products', app()->getLocale()) }}</p>
-                  </a>
-                </li>
-                <a href="" class="nav-link">
+                <a href="{{route('products')}}" class="nav-link">
+                  <i class="fa fa-briefcase"></i>
+                  <p>{{ GoogleTranslate::trans('All Products', app()->getLocale()) }}</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
                   <i class="nav-icon fa fa-users"></i>
                   <p>
                     {{ GoogleTranslate::trans('List of Partners', app()->getLocale()) }}
                     <i class="fas fa-angle-left right"></i>
+                    <span class="badge badge-info right">{{count($companylists)}}</span>
                   </p>
-                  <span class="badge badge-info right">{{count($companylists)}}</span>
                 </a>
                 <ul class="nav nav-treeview">
-                @foreach ($companylists as $companylist)
-                <li class="nav-item">
-                  <a href="{{route('partnerproduct',strtolower($companylist->company))}}" class="nav-link">
-                    <i class="fa fa-briefcase"></i>
-                    <p>{{$companylist->company}}</p>
-                  </a>
-                </li>
-                @endforeach
+                  @foreach ($companylists as $companylist)
+                  <li class="nav-item">
+                    <a href="{{route('partnerproduct',strtolower($companylist->company))}}" class="nav-link">
+                      <i class="fa fa-briefcase"></i>
+                      <p>{{$companylist->company}}</p>
+                    </a>
+                  </li>
+                  @endforeach
                 </ul>
               </li>
-              @endif
               <li class="nav-item">
                 <a href="{{route('addproduct')}}" class="nav-link">
                   <i class="nav-icon fas fa-file-upload"></i>
@@ -289,6 +288,7 @@
                   </p>
                 </a>
               </li>
+            @endif
             </ul>
           </li>
           @endif
