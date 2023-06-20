@@ -92,22 +92,24 @@
               <span class="text-danger">@error('company'){{ $message }}@enderror</span>
           </div>
           <div class="form-group">
+            <?php $categories = DB::select('select * from categories') ?>
               <label for="category">Category:</label>
               <select  name="category" id="category" class="form-control">
-                <option value="Bust & Torso">Bust & Torso</option>
-                <option value="Mannequin">Mannequin</option>
-                <option value="Props">Props</option>
-                <option value="Accessories">Accessories</option>
+                @foreach ($categories as $categ)
+                <option value="{{$categ->category}}" <?php if(old('category')==$categ->category){ echo 'selected';} ?>>{{$categ->category}}</option>
+                @endforeach
               </select>
           </div>
           <div>
               <span class="text-danger">@error('category'){{ $message }}@enderror</span>
           </div>
           <div class="form-group">
+            <?php $types = DB::select('select * from types') ?>
               <label for="type">Type:</label>
               <select  name="type" id="type" class="form-control">
-                <option value="Standard">Standard</option>
-                <option value="Special">Special</option>
+                @foreach ($types as $type)
+                <option value="{{$type->type}}" <?php if(old('type')==$type->type){ echo 'selected';} ?>>{{$type->type}}</option>
+                @endforeach
               </select>
           </div>
           <div>
@@ -150,6 +152,15 @@
           <div>
               <span class="text-danger">@error('pdf'){{ $message }}@enderror</span>
           </div>
+
+          <div class="form-group">
+            <label for="3df">3D File:</label> <span class="text-muted">(optional)</span>
+            <input type="file" name="3df" id="3df" class="form-control" value="{{old('3df')}}">
+        </div>
+        <div>
+            <span class="text-danger">@error('3df'){{ $message }}@enderror</span>
+        </div>
+
           <div class="form-group" id="access">
             <div><label for="priceaccess">Price Accesslists</label></div>
             <select class="select2" name="priceaccess[]" multiple="multiple" data-placeholder="Access Lists" style="width: 100%;">

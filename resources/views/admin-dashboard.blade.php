@@ -129,6 +129,7 @@
     <!-- /.Left col -->
     <!-- right col (We are only adding the ID to make the widgets sortable)-->
     <section class="col-lg-3 connectedSortable">
+      <?php print_r(session()->get('folder')); ?>
     </section>
     <section class="col-lg-3 connectedSortable">
     </section>

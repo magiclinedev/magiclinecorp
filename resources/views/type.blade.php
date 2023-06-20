@@ -1,124 +1,105 @@
-@extends('dash-layout')
-<?php
-  if(isset($_GET['comp']) && isset($_GET['categ']) && isset($_GET['type'])){
-    $comp = ucwords($_GET['comp']);
-    $categ = $_GET['categ'];
-    $type = ucwords($_GET['type']);
-    if($categ=='busttorso'){
-      $choice = "Bust & Torso";
-    } else{
-      $choice = ucwords($categ);
-    }
-  
-?>
+@extends('admin-dash-layout')
 @section('title')
-    {{ucwords($comp)}} | {{ucwords($choice)}}
+  {{ GoogleTranslate::trans('Admin | Types', app()->getLocale()) }}
+@endsection
+@section('page-active')
+  {{ GoogleTranslate::trans('Types', app()->getLocale()) }}
 @endsection
 @section('links')
   <!-- DataTables -->
   <link rel="stylesheet" href="{{asset('/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
   <link rel="stylesheet" href="{{asset('/plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
   <link rel="stylesheet" href="{{asset('/plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
+  <!-- Ekko Lightbox -->
+  <link rel="stylesheet" href="{{asset('plugins/ekko-lightbox/ekko-lightbox.css')}}">
+  
+  <style>
+    @media print {
+      #unprintable,#example1_paginate,#example1_info,#example1_filter,.dt-buttons,.card-header {
+        display: none;
+      }
+    }
+  </style>
 @endsection
 @section('main-content')
 <div class="row">
   <div class="col-12">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title"><?php echo $comp.' | '.$choice.' | '.$type;?> </h3>
+        @if(Session::get('success'))
+        <div class="alert alert-success alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <i class="icon fas fa-check"></i> {{ GoogleTranslate::trans(Session::get('success'), app()->getLocale()) }}
+        </div>
+        @endif
+        @if(Session::get('deleted'))
+        <div class="alert alert-danger alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          <i class="icon fas fa-ban"></i>  {{ GoogleTranslate::trans(Session::get('deleted'), app()->getLocale()) }}
+        </div>
+        @endif
+        <div class="row">
+          <div class="col">
+            <h3 class="card-title">{{ GoogleTranslate::trans('Types', app()->getLocale()) }}</h3>
+            
+            
+          </div>
+        </div>
       </div>
       <!-- /.card-header -->
       <div class="card-body">
+        <form method="post" class="form-group" id="trashform" action="{{route('trashtype')}}">
+        @csrf
+        <div class="row">
+          <div class="col-sm-2">
+            <div class="input-group">
+              <select class="form-control" name="action" aria-placeholder="Bulk Action">
+                <option value="" disabled selected hidden>Bulk Action</option>
+                <option value="deletetype" >Permanently Delete</option>
+                    
+              </select>
+              <button type="submit" class="btn btn-outline-dark ml-1">{{ GoogleTranslate::trans('Apply', app()->getLocale()) }}</button>
+            </div>
+          </div>
+          <div> <a href="{{route('addtype')}}" class="btn btn-light ml-3"><i class="fa fa-user-plus"></i> {{ GoogleTranslate::trans('Add New Type', app()->getLocale()) }}</a> </div>
+
+        </div>
         <table id="example1" class="table table-bordered table-striped">
           <thead>
           <tr>
-            <th>Image</th>
-            <th>Purchase Order</th>
-            <th>Reference Name</th>
-            <th>Company</th>
-            <th>Information</th>
-            <th>Action</th>
+            <th><input type="checkbox" id="select-all"></th>
+            <th>{{ GoogleTranslate::trans('Type', app()->getLocale()) }}</th>
+            <th>{{ GoogleTranslate::trans('Addedby', app()->getLocale()) }}</th>
           </tr>
           </thead>
           <tbody>
       <?php
-        $products = DB::table('products')
-          ->where('company', 'like', $comp)
-          ->where('category', 'like', $choice)
-          ->where('type', 'like', $type)
-          ->get();
-        foreach ($products as $product) { 
-          $delimiter = ",";
-          $image_array = explode($delimiter, $product->images);
-          $first_image = $image_array[0];
-        ?>
-        <tr>
-          <td><img src="{{asset('storage/product_images/'.$first_image)}}" alt="<?php echo $first_image;?>" style="height: 100px"></td>
-          <td><?php echo $product->po; ?></td>
-          <td><?php echo $product->refname; ?></td>
-          <td><?php echo $product->company; ?></td>
-          <td><?php echo $product->information; ?></td>
-          <td>
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal<?php echo $product->id; ?>">
-              View Info
-            </button>
-          </td>
-        </tr>
-  
-        <!-- Modal -->
-        <div class="modal fade" id="myModal<?php echo $product->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-          <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">Product Information</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <div class="row">
-                  <div class="col-6">
-                    @foreach(explode($delimiter, $product->images) as $image)
-                    <img src="{{asset('storage/product_images/'.$image)}}" alt="<?php echo $image;?>" class="mt-2" style="height: 300px; width: 250px;">
-                    @endforeach
-                  </div>
-                  <div class="col-6">
-                    <p><strong>PO:</strong> <?php echo $product->po; ?></p>
-                    <p><strong>Refname:</strong> <?php echo $product->refname; ?></p>
-                    <p><strong>Company:</strong> <?php echo $product->company; ?></p>
-                    <p><strong>Info:</strong> <?php echo $product->information; ?></p>
-                    <!-- Add additional product information here -->
-                  </div>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        foreach ($types as $type) { ?>
+          <tr>
+            <td><input type="checkbox" value="{{$type->id}}" name="checkbox[]"></td>
+            <td><?php echo $type->type; ?></td>
+            <td><?php echo $type->addedby.' on '.date("M-d-y", strtotime($type->created_at)).' at '.date("H:i:s", strtotime($type->created_at)); ?></td>
+            
+          </tr>
       <?php } ?>
           
           
           </tbody>
           <tfoot>
           <tr>
-            <th>Image</th>
-            <th>Purchase Order</th>
-            <th>Reference Name</th>
-            <th>Company</th>
-            <th>Information</th>
-            <th>Action</th>
+            <th></th>
+            <th>{{ GoogleTranslate::trans('Type', app()->getLocale()) }}</th>
+            <th>{{ GoogleTranslate::trans('Addedby', app()->getLocale()) }}</th>
           </tr>
           </tfoot>
         </table>
+        </form>
       </div>
       <!-- /.card-body -->
     </div>
     <!-- /.card -->
   </div>
 </div>
-
 @endsection
 @section('scripts')
 <!-- DataTables  & Plugins -->
@@ -134,29 +115,49 @@
 <script src="{{asset('/plugins/datatables-buttons/js/buttons.html5.min.js')}}"></script>
 <script src="{{asset('/plugins/datatables-buttons/js/buttons.print.min.js')}}"></script>
 <script src="{{asset('/plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
+<!-- Ekko Lightbox -->
+<script src="{{asset('plugins/ekko-lightbox/ekko-lightbox.min.js')}}"></script>
 <script>
     $(function () {
       $("#example1").DataTable({
         "responsive": true, "lengthChange": false, "autoWidth": false,
         //"buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
       }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-      $('#example2').DataTable({
-        "paging": true,
-        "lengthChange": false,
-        "searching": false,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
-        "responsive": true,
-      });
     });
 </script>
 
+<script>
+  $(function () {
+    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+      event.preventDefault();
+      $(this).ekkoLightbox({
+        alwaysShowClose: true
+      });
+    });
 
+    $('.filter-container').filterizr({gutterPixels: 3});
+    $('.btn[data-filter]').on('click', function() {
+      $('.btn[data-filter]').removeClass('active');
+      $(this).addClass('active');
+    });
+  })
+</script>
+<script type="text/javascript">  
+  // Add this code in a script tag or external JavaScript file
+
+  // Get the "Select All" checkbox element
+  const selectAllCheckbox = document.getElementById('select-all');
+
+  // Get all the checkboxes within the form
+  const checkboxes = document.querySelectorAll('#trashform input[type="checkbox"]');
+
+  // Add event listener to the "Select All" checkbox
+  selectAllCheckbox.addEventListener('change', function () {
+      // Loop through all the checkboxes
+      checkboxes.forEach(function (checkbox) {
+          // Check/uncheck each checkbox based on the state of the "Select All" checkbox
+          checkbox.checked = selectAllCheckbox.checked;
+      });
+  });           
+</script>
 @endsection
-<?php
-}
-else {
-  echo "<script>location.replace('/')</script>";
-}
-?>

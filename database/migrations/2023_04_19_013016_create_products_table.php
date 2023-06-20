@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('addedby');
             $table->string('updatedby')->nullable();
             $table->string('archived')->nullable();
-            //$table->timestamps();
+            $table->timestamps();
         });
     }
 

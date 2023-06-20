@@ -20,7 +20,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title')</title>
-
+  <link rel="icon" href="{{asset('images/MAGICLINE-ICON.png')}}" type="image/png" sizes="any">
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
@@ -256,9 +256,63 @@
               @endphp
               <li class="nav-item">
                 <a href="{{route('products')}}" class="nav-link">
-                  <i class="fa fa-briefcase"></i>
+                  <i class="fa fa-clipboard"></i>
                   <p>{{ GoogleTranslate::trans('All Products', app()->getLocale()) }}</p>
                 </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('addproduct')}}" class="nav-link">
+                  <i class="nav-icon fas fa-file-upload"></i>
+                  <p>
+                    {{ GoogleTranslate::trans('Add New Product', app()->getLocale()) }}
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon fa fa-clipboard"></i>
+                  <p>
+                    {{ GoogleTranslate::trans('Categories', app()->getLocale()) }}
+                    <i class="fas fa-angle-left right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{{route('categories')}}" class="nav-link">
+                      <i class="fa fa-clipboard"></i>
+                      <p>{{ GoogleTranslate::trans('All Categories', app()->getLocale()) }}</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{route('addcategory')}}" class="nav-link">
+                      <i class="fa fa-file-upload"></i>
+                      <p>{{ GoogleTranslate::trans('Add New Category', app()->getLocale()) }}</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon fa fa-clipboard"></i>
+                  <p>
+                    {{ GoogleTranslate::trans('Types', app()->getLocale()) }}
+                    <i class="fas fa-angle-left right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{{route('types')}}" class="nav-link">
+                      <i class="fa fa-clipboard"></i>
+                      <p>{{ GoogleTranslate::trans('All Types', app()->getLocale()) }}</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{route('addtype')}}" class="nav-link">
+                      <i class="fa fa-file-upload"></i>
+                      <p>{{ GoogleTranslate::trans('Add New Type', app()->getLocale()) }}</p>
+                    </a>
+                  </li>
+                </ul>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
@@ -279,14 +333,6 @@
                   </li>
                   @endforeach
                 </ul>
-              </li>
-              <li class="nav-item">
-                <a href="{{route('addproduct')}}" class="nav-link">
-                  <i class="nav-icon fas fa-file-upload"></i>
-                  <p>
-                    {{ GoogleTranslate::trans('Add New Product', app()->getLocale()) }}
-                  </p>
-                </a>
               </li>
             @endif
             </ul>

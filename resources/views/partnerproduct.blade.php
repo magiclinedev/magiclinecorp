@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="{{asset('/plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
   <!-- Ekko Lightbox -->
   <link rel="stylesheet" href="{{asset('plugins/ekko-lightbox/ekko-lightbox.css')}}">
+  
 @endsection
 @section('main-content')
 <div class="row" >
@@ -49,13 +50,6 @@
               $userrole = $role->role;
             }
           ?>
-          <div>
-            @if ($userrole=='admin1'||$userrole=='owner')
-            <button type="button" class="btn btn-outline-dark mr-1" data-toggle="modal" data-target="#myModal2">
-              <i class="fas fa-trash"></i> {{ GoogleTranslate::trans('Move to Trash', app()->getLocale()) }}
-            </button>  
-            @endif
-          </div>
           <div class="col-sm-3">
             
             <form method="get" class="form-group" action="{{url('admin/partnerproduct/'.$company)}}">
@@ -77,34 +71,44 @@
             <a href="{{route('addproduct',['company'=>$company])}}" class="btn btn-light"><i class="fas fa-file-upload"></i><span class="ml-2">{{ GoogleTranslate::trans('Add Product', app()->getLocale()) }}</span></a>
             
             @if ($userrole=='admin1'||$userrole=='owner')
-            <a href="{{route('trashproduct',['company'=>$company])}}" class="btn btn-light"><i class="fas fa-trash"></i> {{ GoogleTranslate::trans('Trash', app()->getLocale()) }}
-              <span class="right badge badge-danger">{{count($producttrash)}}</span>
-            </a>
+              @if (count($producttrash)>0)
+              <a href="{{route('trashproduct',['company'=>$company])}}" class="btn btn-light"><i class="fas fa-trash"></i> {{ GoogleTranslate::trans('Trash', app()->getLocale()) }}
+                <span class="right badge badge-danger">{{count($producttrash)}}</span>
+              </a>
+              @endif
             @endif
             
           </div>
-        </div>
+        <div class="col-12">
         <form action="{{route('trashproducts')}}" id="productform" method="post">
+          <div class="col-sm-2 p-0">
+            <div class="input-group">
+              <select class="form-control" name="actions" aria-placeholder="Bulk Action">
+                <option value="" disabled selected hidden>Bulk Action</option>
+                <option value="Move to Trash">Move to Trash</option>
+                    
+              </select>
+              <button type="submit" class="btn btn-outline-dark ml-1">{{ GoogleTranslate::trans('Apply', app()->getLocale()) }}</button>
+            </div>
+          </div>
           @csrf
         <table id="example1" class="table table-bordered table-striped">
           <thead>
           <tr>
             <th><input type="checkbox" id="select-all"></th>
             <th>{{ GoogleTranslate::trans('Image', app()->getLocale()) }}</th>
-            <th>{{ GoogleTranslate::trans('Purchase Order', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Item Reference', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Category', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Type', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Added By', app()->getLocale()) }}</th>
-            <th>{{ GoogleTranslate::trans('Updated By', app()->getLocale()) }}</th>
-            <th>{{ GoogleTranslate::trans('Action', app()->getLocale()) }}</th>
+            <th>{{ GoogleTranslate::trans('Modified By', app()->getLocale()) }}</th>
           </tr>
           </thead>
           <tbody>
       <?php 
         
         
-        foreach ($products as $product) {
+        foreach ($products as $key => $product) {
           $image_array = [];
           foreach (explode(",",$product->images) as $value) {
               $image_array[] = $value;
@@ -119,18 +123,32 @@
               <img src="{{asset('storage/product_images/'.$first_image)}}" alt="<?php echo $first_image;?>" style="height: 100px">
             </a>
           </td>
-          <td><?php echo $product->po; ?></td>
-          <td><?php echo $product->itemref; ?></td>
-          <td><?php echo $product->category; ?></td>
-          <td><?php echo $product->type; ?></td>
-          <td><?php echo $product->addedby; ?></td>
-          <td><?php echo $product->updatedby; ?></td>
           <td>
-            <a href="{{route('product_detail',$product->id)}}" class="btn btn-light">
-              <i class="fas fa-eye"></i> {{ GoogleTranslate::trans('View', app()->getLocale()) }}
-            </a>
-            <a href="{{route('editproduct',$product->id)}}" class="btn btn-light"><i class="fa fa-edit"></i> {{ GoogleTranslate::trans('Edit', app()->getLocale()) }}</a>
-            
+            <p onmouseover="document.getElementById('actions{{$key}}').style.display = 'block';" class="text-md"><?php echo $product->itemref; ?></p>
+            <span id="actions{{$key}}" style="display: none;" class="text-sm" onmouseleave="document.getElementById('actions{{$key}}').style.display = 'none';">
+              <a href="{{route('product_detail',$product->id)}}" class="text-dark">
+                <i class="fas fa-eye"></i> {{ GoogleTranslate::trans('View', app()->getLocale()) }}
+              </a> | 
+              <a href="{{route('editproduct',$product->id)}}" class="text-dark">
+                <i class="fa fa-edit"></i> {{ GoogleTranslate::trans('Edit', app()->getLocale()) }}
+              </a> | 
+              @if ($userrole=='admin1' || $userrole=='owner')
+              <a href="{{route('trashproducts',['id'=>$product->id])}}" class="text-dark">
+                <i class="fa fa-trash"></i> {{ GoogleTranslate::trans('Trash', app()->getLocale()) }}
+              </a> |
+              @endif 
+              <a href="{{route('duplicateproduct',['id'=>$product->id])}}" class="text-dark">
+                <i class="fas fa-clone"></i> {{ GoogleTranslate::trans('Duplicate', app()->getLocale()) }}
+              </a>
+            </span>
+          </td>
+          <td class="text-md"><?php echo $product->category; ?></td>
+          <td class="text-md"><?php echo $product->type; ?></td>
+          <td class="text-md"><?php echo $product->addedby.' on '.date("M-d-y", strtotime($product->created_at)).' at '.date("H:i:s", strtotime($product->created_at)); ?></td>
+          <td class="text-md">
+            <?php if ($product->updatedby) {
+              echo $product->updatedby.' on '.date("M-d-y", strtotime($product->updated_at)).' at '.date("H:i:s", strtotime($product->updated_at));
+            } ?>
           </td>
         </tr>
   
@@ -144,13 +162,11 @@
           <tr>
             <th></th>
             <th>{{ GoogleTranslate::trans('Image', app()->getLocale()) }}</th>
-            <th>{{ GoogleTranslate::trans('Purchase Order', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Item Reference', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Category', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Type', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Added By', app()->getLocale()) }}</th>
-            <th>{{ GoogleTranslate::trans('Updated By', app()->getLocale()) }}</th>
-            <th>{{ GoogleTranslate::trans('Action', app()->getLocale()) }}</th>
+            <th>{{ GoogleTranslate::trans('Modified By', app()->getLocale()) }}</th>
           </tr>
           </tfoot>
         </table>
@@ -176,13 +192,14 @@
         </div>
       </form>
       </div>
+      </div>
+      </div>
       <!-- /.card-body -->
     </div>
     <!-- /.card -->
   </div>
 </div>
 
-<p class="output"></p>
 @endsection
 @section('scripts')
 <!-- DataTables  & Plugins -->

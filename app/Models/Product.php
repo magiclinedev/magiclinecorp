@@ -12,5 +12,5 @@ class Product extends Model
     protected $fillable = [
         'po', 'itemref', 'company', 'category', 'type', 'price', 'description', 'images','file','pdf', 'addedby','updatedby','archived',
     ];
-    public $timestamps = false;
+    //public $timestamps = false;
 }

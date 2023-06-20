@@ -74,7 +74,7 @@
       <a href="{{asset('storage/product_files/'.$products->file)}}" class="btn btn-outline-dark" download="{{$products->file}}"><i class="fa fa-download"></i> Download Costing</a> 
       @endif
       @if (!empty($products->pdf))
-      <a href="{{asset('storage/product_pdfs/'.$products->pdf)}}" class="btn btn-outline-dark"><i class="fa fa-download"></i> View PDF</a> 
+      <a href="{{asset('storage/product_pdfs/'.$products->pdf)}}" class="btn btn-outline-dark" target="_blank"><i class="fa fa-download"></i> View PDF</a> 
       <a href="{{asset('storage/product_pdfs/'.$products->pdf)}}" class="btn btn-outline-dark" download="{{$products->pdf}}"><i class="fa fa-download"></i> Download PDF</a> 
       @endif
     </div>
@@ -93,7 +93,7 @@
       "navBorder": 1,
     
       // autoplay
-      "autoPlay":true,
+      "autoPlay":false,
     
       // autoplay interval in milliseconds
       "autoPlayTimeout": 2000

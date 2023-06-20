@@ -7,6 +7,10 @@ use App\Http\Controllers\LangController;
 use App\Http\Controllers\PartnersController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UploadTempFileController;
+use App\Http\Controllers\DeleteTempFileController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TypeController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -86,6 +90,7 @@ Route::group(['middleware'=>['AuthCheck']], function(){
                 Route::match(['get','post'],'/trashproductaction', [ProductController::class, 'trashaction'])->name('trashproductaction');
                 Route::match(['get','post'],'/restoreproduct', [ProductController::class, 'restoreproduct'])->name('restoreproduct');
                 Route::match(['get','post'],'/deleteproduct',[ProductController::class, 'deleteproduct'])->name('deleteproduct');
+                Route::match(['get','post'],'/duplicateproduct',[ProductController::class, 'duplicateproduct'])->name('duplicateproduct');
                 Route::get('/addcompany',[AdminController::class, 'addcompany'])->name('addcompany');
                 Route::post('/storecomp',[AdminController::class, 'storecomp'])->name('storecomp');
                 Route::get('/partners',[AdminController::class, 'partners'])->name('partners');
@@ -95,8 +100,8 @@ Route::group(['middleware'=>['AuthCheck']], function(){
                 Route::match(['get','post'],'/restorecomp',[AdminController::class, 'restorecomp'],)->name('restorecomp');
                 Route::match(['get','post'],'/trashcomp',[AdminController::class, 'trashcomp'],)->name('trashcomp');
                 Route::match(['get','post'],'/deletecomp',[AdminController::class, 'compdelete'],)->name('deletecomp');
-                Route::post('/tmp-upload',[ProductController::class, 'tmpUpload']);
-                Route::delete('/tmp-delete',[ProductController::class, 'tmpDelete']);
+                Route::post('/tmp-upload',UploadTempFileController::class);
+                Route::delete('/tmp-delete',DeleteTempFileController::class);
                 Route::get('/activitylogs',[AdminController::class, 'activitylogs'])->name('activitylogs');
                 Route::match(['get','post'],'/partneredcompany', [PartnersController::class, 'partneredcompany'])->name('partneredcompany');
                 Route::match(['get','post'],'/product_detail/{id}', [ProductController::class, 'product_detail'])->name('product_detail');
@@ -109,6 +114,14 @@ Route::group(['middleware'=>['AuthCheck']], function(){
                 Route::match(['get','post'],'/restorereport', [BugReportController::class, 'restorereport'])->name('restorereport');
                 Route::match(['get','post'],'/reportdelete', [BugReportController::class, 'reportdelete'])->name('reportdelete');
                 Route::match(['post'],'/genproductpdf',[ProductController::class, 'genproductpdf'])->name('genproductpdf');
+                Route::get('/categories',[CategoryController::class,'categories'])->name('categories');
+                Route::get('/addcategory',[CategoryController::class,'addcategory'])->name('addcategory');
+                Route::match(['get','post'],'/storecateg', [CategoryController::class, 'storecateg'])->name('storecateg');
+                Route::match(['get','post'],'/trashcateg', [CategoryController::class, 'trashcateg'])->name('trashcateg');
+                Route::get('/types',[TypeController::class,'types'])->name('types');
+                Route::get('/addtype',[TypeController::class,'addtype'])->name('addtype');
+                Route::match(['get','post'],'/storetype', [TypeController::class, 'storetype'])->name('storetype');
+                Route::match(['get','post'],'/trashtype', [TypeController::class, 'trashtype'])->name('trashtype');
             });
             
             Route::get('/edituser', [UserController::class, 'edituser'])->name('edituser');

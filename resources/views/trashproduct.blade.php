@@ -67,8 +67,7 @@
             <th>{{ GoogleTranslate::trans('Category', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Type', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Added By', app()->getLocale()) }}</th>
-            <th>{{ GoogleTranslate::trans('Updated By', app()->getLocale()) }}</th>
-            <th>{{ GoogleTranslate::trans('Action', app()->getLocale()) }}</th>
+            <th>{{ GoogleTranslate::trans('Modified By', app()->getLocale()) }}</th>
           </tr>
           </thead>
           <tbody>
@@ -97,11 +96,6 @@
                 <td><?php echo $product->type; ?></td>
                 <td><?php echo $product->addedby; ?></td>
                 <td><?php echo $product->updatedby; ?></td>
-                <td class="d-flex">
-                  <a href="{{route('product_detail',['id'=>$product->id,'trash'=>$product->company])}}" class="btn btn-light">
-                    <i class="fas fa-eye"></i> {{ GoogleTranslate::trans('View', app()->getLocale()) }}
-                  </a>
-                </td>
               </tr>
         
             <?php } ?>
@@ -117,8 +111,7 @@
             <th>{{ GoogleTranslate::trans('Category', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Type', app()->getLocale()) }}</th>
             <th>{{ GoogleTranslate::trans('Added By', app()->getLocale()) }}</th>
-            <th>{{ GoogleTranslate::trans('Updated By', app()->getLocale()) }}</th>
-            <th>{{ GoogleTranslate::trans('Action', app()->getLocale()) }}</th>
+            <th>{{ GoogleTranslate::trans('Modified By', app()->getLocale()) }}</th>
           </tr>
           </tfoot>
         </table>

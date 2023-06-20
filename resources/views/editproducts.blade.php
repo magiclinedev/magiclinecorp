@@ -73,45 +73,24 @@
               <span class="text-danger">@error('company'){{ $message }}@enderror</span>
           </div>
           <div class="form-group">
+            <?php $categories = DB::select('select * from categories') ?>
               <label for="category">{{ GoogleTranslate::trans('Category:', app()->getLocale()) }}</label>
               <select  name="category" id="category" class="form-control">
-                @if ($product->category=='Bust & Torso')
-                <option value="Bust & Torso" selected>Bust & Torso</option>
-                <option value="Mannequin">Mannequin</option>
-                <option value="Props">Props</option>
-                <option value="Accessories">Accessories</option>
-                @elseif ($product->category=='Mannequin')
-                <option value="Bust & Torso">Bust & Torso</option>
-                <option value="Mannequin" selected>Mannequin</option>
-                <option value="Props">Props</option>
-                <option value="Accessories">Accessories</option>
-                @elseif ($product->category=='Props')
-                <option value="Bust & Torso">Bust & Torso</option>
-                <option value="Mannequin">Mannequin</option>
-                <option value="Props" selected>Props</option>
-                <option value="Accessories">Accessories</option>
-                @else
-                <option value="Bust & Torso">Bust & Torso</option>
-                <option value="Mannequin">Mannequin</option>
-                <option value="Props">Props</option>
-                <option value="Accessories" selected>Accessories</option>
-                @endif
-                
+                @foreach ($categories as $categ)
+                <option value="{{$categ->category}}" <?php if($product->category==$categ->category){ echo 'selected';} ?>>{{$categ->category}}</option>
+                @endforeach
               </select>
           </div>
           <div>
               <span class="text-danger">@error('category'){{ $message }}@enderror</span>
           </div>
           <div class="form-group">
+            <?php $types = DB::select('select * from types') ?>
               <label for="type">{{ GoogleTranslate::trans('Type:', app()->getLocale()) }}</label>
               <select  name="type" id="type" class="form-control">
-                @if ($product->type=='Standard')
-                <option value="Standard" selected>Standard</option>
-                <option value="Special">Special</option>
-                @else
-                <option value="Standard">Standard</option>
-                <option value="Special" selected>Special</option>
-                @endif
+                @foreach ($types as $type)
+                <option value="{{$type->type}}" <?php if($product->type==$type->type){ echo 'selected';} ?>>{{$type->type}}</option>
+                @endforeach
               </select>
           </div>
           <div>

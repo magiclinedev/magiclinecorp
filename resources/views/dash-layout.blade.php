@@ -21,6 +21,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title')</title>
+  <link rel="icon" href="{{asset('images/MAGICLINE-ICON.png')}}" type="image/png" sizes="any">
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -279,32 +280,11 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
-              @if ($user_role=='admin1' ||  $user_role=='owner')
               <li class="nav-item">
                 <a href="{{route('products')}}" class="nav-link">
-                  <i class="fa fa-briefcase"></i>
+                  <i class="fa fa-clipboard"></i>
                   <p>{{ GoogleTranslate::trans('All Products', app()->getLocale()) }}</p>
                 </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fa fa-users"></i>
-                  <p>
-                    {{ GoogleTranslate::trans('List of Partners', app()->getLocale()) }}
-                    <i class="fas fa-angle-left right"></i>
-                    <span class="badge badge-info right">{{count($companylists)}}</span>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  @foreach ($companylists as $companylist)
-                  <li class="nav-item">
-                    <a href="{{route('partnerproduct',strtolower($companylist->company))}}" class="nav-link">
-                      <i class="fa fa-briefcase"></i>
-                      <p>{{$companylist->company}}</p>
-                    </a>
-                  </li>
-                  @endforeach
-                </ul>
               </li>
               <li class="nav-item">
                 <a href="{{route('addproduct')}}" class="nav-link">
@@ -314,7 +294,73 @@
                   </p>
                 </a>
               </li>
-            @endif
+              
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fa fa-clipboard"></i>
+                <p>
+                  {{ GoogleTranslate::trans('Categories', app()->getLocale()) }}
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{{route('categories')}}" class="nav-link">
+                    <i class="fa fa-clipboard"></i>
+                    <p>{{ GoogleTranslate::trans('All Categories', app()->getLocale()) }}</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('addcategory')}}" class="nav-link">
+                    <i class="fa fa-file-upload"></i>
+                    <p>{{ GoogleTranslate::trans('Add New Category', app()->getLocale()) }}</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fa fa-clipboard"></i>
+                <p>
+                  {{ GoogleTranslate::trans('Types', app()->getLocale()) }}
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{{route('types')}}" class="nav-link">
+                    <i class="fa fa-clipboard"></i>
+                    <p>{{ GoogleTranslate::trans('All Types', app()->getLocale()) }}</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('addtype')}}" class="nav-link">
+                    <i class="fa fa-file-upload"></i>
+                    <p>{{ GoogleTranslate::trans('Add New Type', app()->getLocale()) }}</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fa fa-users"></i>
+                <p>
+                  {{ GoogleTranslate::trans('List of Partners', app()->getLocale()) }}
+                  <i class="fas fa-angle-left right"></i>
+                  <span class="badge badge-info right">{{count($companylists)}}</span>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                @foreach ($companylists as $companylist)
+                <li class="nav-item">
+                  <a href="{{route('partnerproduct',strtolower($companylist->company))}}" class="nav-link">
+                    <i class="fa fa-briefcase"></i>
+                    <p>{{$companylist->company}}</p>
+                  </a>
+                </li>
+                @endforeach
+              </ul>
+            </li>
             </ul>
           </li>
           @endif
@@ -339,7 +385,7 @@
               @if ($access=='ALL')
               <li class="nav-item">
                 <a href="{{route('products')}}" class="nav-link">
-                  <i class="fa fa-briefcase"></i>
+                  <i class="fa fa-clipboard"></i>
                   <p>{{ GoogleTranslate::trans('All Products', app()->getLocale()) }}</p>
                 </a>
               </li>
@@ -397,7 +443,7 @@
               @if ($access=='ALL')
               <li class="nav-item">
                 <a href="{{route('products2')}}" class="nav-link">
-                  <i class="fa fa-briefcase"></i>
+                  <i class="fa fa-clipboard"></i>
                   <p>{{ GoogleTranslate::trans('All Products', app()->getLocale()) }}</p>
                 </a>
               </li>
@@ -413,7 +459,7 @@
                 <ul class="nav nav-treeview">
                   @foreach ($companylists as $companylist)
                   <li class="nav-item">
-                    <a href="{{route('partnerproduct',strtolower($companylist->company))}}" class="nav-link">
+                    <a href="{{route('company',strtolower($companylist->company))}}" class="nav-link">
                       <i class="fa fa-briefcase"></i>
                       <p>{{$companylist->company}}</p>
                     </a>
@@ -423,28 +469,17 @@
               </li>
               @else
               <li class="nav-item">
-                <a href="{{route('partnerproduct',strtolower($access))}}" class="nav-link">
+                <a href="{{route('company',strtolower($access))}}" class="nav-link">
                   <i class="fa fa-warehouse"></i>
                   <p>{{$access}}</p>
                 </a>
               </li>
               @endif   
             @endforeach
-          @endif
-          @if ( $user_role=='owner' || $user_role == 'admin1' || $user_role == 'admin2')
           
-          <li class="nav-item">
-            <a href="{{route('addproduct')}}" class="nav-link">
-              <i class="nav-icon fas fa-file-upload"></i>
-              <p>
-                {{ GoogleTranslate::trans('Add New Product', app()->getLocale()) }}
-              </p>
-            </a>
-          </li>
-          @endif
-              
             </ul>
           </li>
+          @endif
           @if ($user_role=='admin1' || $user_role=='owner')
           <li class="nav-item">
             <a href="#" class="nav-link">
@@ -499,7 +534,7 @@
                 {{ GoogleTranslate::trans('Logout', app()->getLocale()) }}
               </p>
             </a>
-          </li>
+          </li> 
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
