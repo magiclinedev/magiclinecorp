@@ -18,25 +18,14 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'fname',
-        'lname',
-        'username',
+        'name',
         'email',
-        'company',
-        'password',
-        'role',
+        'username',
         'status',
-        'archived',
+        'password',
+        'addedBy',
     ];
-    public $timestamps = false;
-    public function accessLists()
-    {
-        return $this->hasMany(AccessList::class);
-    }
-    public function activityLogs()
-    {
-        return $this->hasMany(ActivityLog::class);
-    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -54,11 +43,11 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
-    protected function role(): Attribute
+
+    public function companies()
     {
-        return new Attribute(
-            get: fn ($value) =>  ["user", "admin", "moderator"][$value],
-        );
+        return $this->belongsToMany(Company::class);
     }
 }

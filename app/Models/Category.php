@@ -7,9 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
+    protected $fillable = ['name, addedBy'];
+
     use HasFactory;
-    protected $fillable = [
-        'category',
-        'archived',
-    ];
 }

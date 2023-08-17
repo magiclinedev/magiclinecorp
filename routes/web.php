@@ -1,16 +1,15 @@
 <?php
-use Barryvdh\DomPDF\Facade\Pdf;
+
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\AuditTrailController;
+use App\Http\Livewire\TableFilter;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\BugReportController;
-use App\Http\Controllers\LangController;
-use App\Http\Controllers\PartnersController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\UploadTempFileController;
-use App\Http\Controllers\DeleteTempFileController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\TypeController;
+use App\Models\Mannequin;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,117 +21,76 @@ use App\Http\Controllers\TypeController;
 |
 */
 
-Route::post('/login', [UserController::class, 'loginprocess'])->name('loginprocess');
-Route::get('/forgotpassword',[UserController::class, 'forgotpassword'])->name('forgotpassword');
-Route::post('/forgotpassword',[UserController::class, 'resetpassrequest'])->name('resetpassrequest');
-Route::get('/changelang', [LangController::class, 'change'])->name('changeLang');
-Route::get('/admin', function () {
-    return back();
-});
-Route::get('/company', function () {
-    return back();
-});
-Route::get('/admin/editproduct', function () {
-    return back();
-});
-Route::get('/admin/partnerproduct', function () {
-    return back();
-});
-Route::get('/admin/readbugreport', function () {
-    return back();
-});
-Route::get('/admin/storecompupdate', function () {
-    return back();
-});
-Route::get('/admin/product_detail', function () {
-    return back();
-});
-Route::get('/admin/user', function () {
-    return back();
-});
-Route::group(['middleware'=>['AuthCheck']], function(){
-    Route::get('/login',[UserController::class, 'login'])->name('login');
-    Route::get('/logout', [UserController::class, 'logout'])->name('logout');
-    Route::group(['middleware' => ['userStatus']], function () {
-        Route::get('/lockscreen', [UserController::class, 'lockscreen'])->name('lockscreen');
-        Route::post('/lockscreen', [UserController::class, 'unlock'])->name('unlock');
-        Route::group(['middleware' => ['inactivityTimeout']], function () {
-            Route::prefix('admin')->group(function () {
-                Route::get('/dashboard', function () {
-                    return view('admin-dashboard');
-                })->name('admin.dashboard');
-                Route::get('/dashboard2', function () {
-                    return view('admin-dashboard2');
-                })->name('admin.dashboard2');
-                Route::get('/users', function () {
-                    return view('users');
-                })->name('users');
-                Route::get('/user/{id}', [UserController::class, 'user'])->name('user');
-                Route::get('/userinfo', [UserController::class, 'userinfo'])->name('userinfo');
-                Route::match(['get','post'],'/adduser', [UserController::class, 'adduser'])->name('adduser');
-                Route::get('/userrequest', [AdminController::class, 'userrequest'])->name('userrequest');
-                Route::post('/grantrequest', [AdminController::class, 'grantrequest'])->name('grantrequest');
-                Route::post('/removerequest', [AdminController::class, 'removerequest'])->name('removerequest');
-                Route::post('/saveuser', [UserController::class, 'saveuser'])->name('saveuser');
-                Route::post('/userupdate', [UserController::class, 'userupdate'])->name('userupdate');
-                Route::match(['get','post'],'/restoreuser', [UserController::class, 'restoreuser'])->name('restoreuser');
-                Route::match(['get','post'],'/userdelete', [UserController::class, 'userdelete'])->name('userdelete');
-                Route::get('/trash', [UserController::class, 'trash'])->name('trash');
-                Route::match(['get','post'],'/trashuser', [UserController::class, 'trashuser'])->name('trashuser');
-                Route::get('/products',[ProductController::class, 'products'])->name('products');
-                Route::match(['get','post'],'/partnerproduct/{company}',[ProductController::class, 'partnerproduct'])->name('partnerproduct');
-                Route::get('/addproduct',[ProductController::class, 'addproducts'])->name('addproduct');
-                Route::get('/editproduct/{id}',[ProductController::class, 'editproducts'])->name('editproduct');
-                Route::post('/storeproduct',[ProductController::class, 'store'])->name('storeproduct');
-                Route::post('/storeupdateproduct',[ProductController::class, 'storeupdateproducts'])->name('storeupdateproduct');
-                Route::get('/trashproduct', [ProductController::class, 'trashproduct'])->name('trashproduct');
-                Route::match(['get','post'],'/trashproducts', [ProductController::class, 'trash'])->name('trashproducts');
-                Route::match(['get','post'],'/trashproductaction', [ProductController::class, 'trashaction'])->name('trashproductaction');
-                Route::match(['get','post'],'/restoreproduct', [ProductController::class, 'restoreproduct'])->name('restoreproduct');
-                Route::match(['get','post'],'/deleteproduct',[ProductController::class, 'deleteproduct'])->name('deleteproduct');
-                Route::match(['get','post'],'/duplicateproduct',[ProductController::class, 'duplicateproduct'])->name('duplicateproduct');
-                Route::get('/addcompany',[AdminController::class, 'addcompany'])->name('addcompany');
-                Route::post('/storecomp',[AdminController::class, 'storecomp'])->name('storecomp');
-                Route::get('/partners',[AdminController::class, 'partners'])->name('partners');
-                Route::get('/updatecomp',[AdminController::class, 'compupdate'],)->name('updatecomp');
-                Route::put('/storecompupdate/{id}',[AdminController::class, 'storecompupdate'],)->name('storecompupdate');
-                Route::get('/trashcompany',[AdminController::class, 'trashcompany'],)->name('trashcompany');
-                Route::match(['get','post'],'/restorecomp',[AdminController::class, 'restorecomp'],)->name('restorecomp');
-                Route::match(['get','post'],'/trashcomp',[AdminController::class, 'trashcomp'],)->name('trashcomp');
-                Route::match(['get','post'],'/deletecomp',[AdminController::class, 'compdelete'],)->name('deletecomp');
-                Route::post('/tmp-upload',UploadTempFileController::class);
-                Route::delete('/tmp-delete',DeleteTempFileController::class);
-                Route::get('/activitylogs',[AdminController::class, 'activitylogs'])->name('activitylogs');
-                Route::match(['get','post'],'/partneredcompany', [PartnersController::class, 'partneredcompany'])->name('partneredcompany');
-                Route::match(['get','post'],'/product_detail/{id}', [ProductController::class, 'product_detail'])->name('product_detail');
-                Route::match(['get','post'],'/accesslists', [PartnersController::class, 'adminaccesslists'])->name('adminaccesslists');
-                Route::match(['get','post'],'/reportedbugs', [BugReportController::class, 'reportedbugs'])->name('reportedbugs');
-                Route::match(['get','post'],'/readbugreport/{id}', [BugReportController::class, 'readbugreport'])->name('readbugreport');
-                Route::match(['get','post'],'/updatereport', [BugReportController::class, 'updatereport'])->name('updatereport');
-                Route::match(['get','post'],'/trashreport', [BugReportController::class, 'trashreport'])->name('trashreport');
-                Route::match(['get','post'],'/trashreports', [BugReportController::class, 'trashreports'])->name('trashreports');
-                Route::match(['get','post'],'/restorereport', [BugReportController::class, 'restorereport'])->name('restorereport');
-                Route::match(['get','post'],'/reportdelete', [BugReportController::class, 'reportdelete'])->name('reportdelete');
-                Route::match(['post'],'/genproductpdf',[ProductController::class, 'genproductpdf'])->name('genproductpdf');
-                Route::get('/categories',[CategoryController::class,'categories'])->name('categories');
-                Route::get('/addcategory',[CategoryController::class,'addcategory'])->name('addcategory');
-                Route::match(['get','post'],'/storecateg', [CategoryController::class, 'storecateg'])->name('storecateg');
-                Route::match(['get','post'],'/trashcateg', [CategoryController::class, 'trashcateg'])->name('trashcateg');
-                Route::get('/types',[TypeController::class,'types'])->name('types');
-                Route::get('/addtype',[TypeController::class,'addtype'])->name('addtype');
-                Route::match(['get','post'],'/storetype', [TypeController::class, 'storetype'])->name('storetype');
-                Route::match(['get','post'],'/trashtype', [TypeController::class, 'trashtype'])->name('trashtype');
-            });
-            
-            Route::get('/edituser', [UserController::class, 'edituser'])->name('edituser');
-            Route::match(['get','post'],'/storeuserupdate', [UserController::class, 'storeuserupdate'])->name('storeuserupdate');
-            Route::match(['get','post'],'/', [PartnersController::class, 'companylist']);
-            Route::match(['get','post'],'/company/{company}', [PartnersController::class, 'company'])->name('company');
-            Route::match(['get','post'],'/bugreport', [BugReportController::class, 'index'])->name('bugreport');
-            Route::match(['get','post'],'/savebugreport', [BugReportController::class, 'savereport'])->name('savebugreport');
-            Route::match(['get','post'],'/product_detail/{id}', [ProductController::class, 'product_detail'])->name('product_detail2');
-            Route::get('/allproducts',[ProductController::class, 'products'])->name('products2');
-        });
-    });
+Route::middleware(['auth'])->group(function () {
+    // Routes that require authentication (dashboard, etc.)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Add other authenticated routes here
 });
 
+Route::get('/', function () {
+    return view('auth.login');
+})->name('login')->middleware('guest');
+
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+});
+Route::middleware(['auth', 'check.user.role:1,2'])->group(function () {
+    // Only Admin 1 and Admin 2 can access these routes
+    // Route::get('/users', [UsersController::class, 'index'])->name('users');
+    // ... other routes for Admin 1 and Admin 2
+});
+
+Route::middleware(['auth', 'can:viewer-access'])->group(function () {
+    // Only Viewer can access these routes
+    // Route::get('/collection', [CollectionController::class, 'index'])->name('collection');
+    // Route::get('/collection-view/{id}', [CollectionController::class, 'view'])->name('collection.view_prod');
+    //  Route::get('/company', [CompanyController::class, 'index'])->name('company');
+    // ... other routes for Viewer
+});
+
+    // Collection/Product
+    Route::get('/collection', [CollectionController::class, 'index'])->name('collection');
+    Route::get('/collection-view/{encryptedId}', [CollectionController::class, 'view'])->name('collection.view_prod');
+    Route::get('/collection-add', [CollectionController::class, 'add'])->name('collection.add');//go to add view
+    Route::post('/remove-image', [CollectionController::class, 'remove'])->name('remove-image');//image removal in add
+    Route::put('/collection-store', [CollectionController::class, 'store'])->name('collection.store');//add product
+    Route::get('/collection-edit/{id}', [CollectionController::class, 'edit'])->name('collection.edit');//go
+    Route::put('/collection-update/{id}', [CollectionController::class, 'update'])->name('collection.update');
+
+    //Trashcan
+    Route::post('/collection/{id}', [CollectionController::class, 'trash'])->name('collection.trash');
+    Route::get('/collection-trash', [CollectionController::class, 'trashcan'])->name('collection.trashcan');
+    Route::get('collection/{id}', [CollectionController::class, 'restore'])->name('collection.restore');
+    Route::get('collection-delete/{id}', [CollectionController::class, 'destroy'])->name('collection.delete');
+
+    // Category
+    Route::get('/collection-category', [CollectionController::class, 'category'])->name('collection.category');
+    Route::post('/collection-category', [CollectionController::class, 'store_category'])->name('collection.category.store');
+
+    //Type
+    Route::get('/collection-type', [CollectionController::class, 'type'])->name('collection.type');
+    Route::post('/collection-type', [CollectionController::class, 'store_type'])->name('collection.type.store');
+
+    // Company
+    Route::get('/company', [CompanyController::class, 'index'])->name('company');
+    Route::post('/add-company', [CompanyController::class, 'company'])->name('company.add');
+
+    //Users
+    Route::get('/users', [UsersController::class, 'index'])->name('users');
+    Route::post('/users-add', [UsersController::class, 'store'])->name('users.add');
+
+
+    //Audit trail
+    Route::get('/audit-trail', [AuditTrailController::class, 'index'])->name('audit-trail');
+
+
+
+require __DIR__.'/auth.php';
