@@ -74,11 +74,11 @@
                     <label for="itemRef" class="block font-bold mb-2">Item Reference</label>
                     <input type="text" name="itemRef" id="itemRef" class="w-full border rounded-md py-2 px-3" placeholder="Enter Item Ref">
                 </div>
-                {{-- Company --}}
+                {{-- COMPANIES --}}
                 <div class="col-span-2 sm:col-span-1">
-                    <label for="companies" class="block font-bold mb-2">Companies</label>
+                    <label for="company" class="block font-bold mb-2">Company</label>
                     <div class="col-span-2 sm:col-span-1 flex items-center">
-                        <select name="companies" id="companies" class="w-full border rounded-md py-2 px-3">
+                        <select name="company" id="company" class="w-full border rounded-md py-2 px-3">
                             @foreach ($companies as $company)
                                 <option value="{{ $company->name }}">{{ $company->name }}</option>
                             @endforeach

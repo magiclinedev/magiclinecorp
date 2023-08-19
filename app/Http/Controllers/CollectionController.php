@@ -161,68 +161,76 @@ class CollectionController extends Controller
             'canViewPrice' => $canViewPrice,
         ]);
     }
+
     // ADD PRODUCT
     public function store(Request $request)
     {
+        $request->validate([
+            'po' => 'nullable|string|max:255',
+            'itemRef' => 'required|string|max:255',
+            'company' => 'nullable|string|max:255',
+            'category' => 'nullable|string|max:255',
+            'type' => 'nullable|string|max:255',
+            'price' => 'nullable|numeric',
+            'description' => 'nullable',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'file' => 'nullable|mimes:xlsx,xls|max:2048',
+            'pdf' => 'nullable|mimes:pdf|max:2048',
+        ]);
+
         $photoPaths = [];
-        // Check if there are uploaded files
+        $excelFileName = null;
+        $pdfFileName = null;
+
+        // Optimize image upload
         if ($request->hasFile('images')) {
-            $photos = $request->file('images');
-
-            foreach ($photos as $photo) {
+            foreach ($request->file('images') as $photo) {
                 $photoName = time() . '_' . $photo->getClientOriginalName();
-                $photo->storeAs('public/images/product/', $photoName);
-
-                // Update the $photoPaths array with the path to each uploaded photo
                 $photoPaths[] = 'images/product/' . $photoName;
+                $photo->storeAs('public/images/product/', $photoName);
             }
         }
-         // File upload logic for Excel file ('file')
-        if ($request->hasFile('file')) {
-            $excelFile = $request->file('file');
-            $excelFileName = time() . '_' . $excelFile->getClientOriginalName();
-            $excelFile->storeAs('public/files/excel/', $excelFileName);
-        }
 
-        // File upload logic for PDF file ('pdf')
-        if ($request->hasFile('pdf')) {
-            $pdfFile = $request->file('pdf');
-            $pdfFileName = time() . '_' . $pdfFile->getClientOriginalName();
-            $pdfFile->storeAs('public/files/pdf/', $pdfFileName);
-        }
+        // Optimize file upload
+        $uploadFile = function ($fileType, $fileKey, $pathPrefix) use ($request) {
+            if ($request->hasFile($fileKey)) {
+                $file = $request->file($fileKey);
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $file->storeAs('public/files/' . $pathPrefix, $fileName);
+                return 'files/' . $pathPrefix . $fileName;
+            }
+            return null;
+        };
+
+        $excelFileName = $uploadFile('file', 'file', 'excel/');
+        $pdfFileName = $uploadFile('pdf', 'pdf', 'pdf/');
 
         // Create a new Mannequin instance and set its properties
-        $mannequin = new Mannequin();
-        $mannequin->po = strtoupper($request->po);
-        $mannequin->itemref = strtoupper($request->itemRef);
-        $mannequin->company = strtoupper($request->company);
-        $mannequin->category = strtoupper($request->category);
-        $mannequin->type = strtoupper($request->type);
-        $mannequin->price = ($request->price);
-        $mannequin->description = ($request->description);
+        $mannequin = new Mannequin([
+            'po' => strtoupper($request->po),
+            'itemref' => strtoupper($request->itemRef),
+            'company' => strtoupper($request->company),
+            'category' => strtoupper($request->category),
+            'type' => strtoupper($request->type),
+            'price' => $request->price,
+            'description' => $request->description,
+        ]);
+
         $this->setActionBy($mannequin, 'Added');
         $mannequin->activeStatus = "1";
 
-        // Set the photo paths if there are uploaded photos
         if (!empty($photoPaths)) {
-            $mannequin->images = implode(',', $photoPaths); // Save multiple image paths as a comma-separated string
+            $mannequin->images = implode(',', $photoPaths);
         }
 
-        // $mannequin->file = ($request->file);//excel file costing
-        // $mannequin->pdf = ($request->pdf);
-
-        // Set the 'file' property if an Excel file was uploaded
-        if (isset($excelFileName)) {
-            $mannequin->file = 'files/excel/' . $excelFileName;
+        if ($excelFileName !== null) {
+            $mannequin->file = $excelFileName;
         }
 
-        // Set the 'pdf' property if a PDF file was uploaded
-        if (isset($pdfFileName)) {
-            $mannequin->pdf = 'files/pdf/' . $pdfFileName;
+        if ($pdfFileName !== null) {
+            $mannequin->pdf = $pdfFileName;
         }
-        //3D file tbd
 
-        // Save the data to the database
         if ($mannequin->save()) {
             return redirect('/collection')->with('success_message', 'Collection has been successfully added!');
         } else {

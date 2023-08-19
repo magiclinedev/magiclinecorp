@@ -2,10 +2,13 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AuditTrailController;
+
+
 use App\Http\Livewire\TableFilter;
 use Illuminate\Support\Facades\Route;
 use App\Models\Mannequin;
@@ -21,30 +24,20 @@ use App\Models\Mannequin;
 |
 */
 
-Route::middleware(['auth'])->group(function () {
-    // Routes that require authentication (dashboard, etc.)
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    // Add other authenticated routes here
-});
-
 Route::get('/', function () {
     return view('auth.login');
-})->name('login')->middleware('guest');
+})->name('auth.login')->middleware('guest');
 
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
 });
+
 Route::middleware(['auth', 'check.user.role:1,2'])->group(function () {
     // Only Admin 1 and Admin 2 can access these routes
-    // Route::get('/users', [UsersController::class, 'index'])->name('users');
+    Route::get('/users', [UsersController::class, 'index'])->name('users');
     // ... other routes for Admin 1 and Admin 2
 });
 
