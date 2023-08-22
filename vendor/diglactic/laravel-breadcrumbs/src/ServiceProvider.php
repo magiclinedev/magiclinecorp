@@ -87,11 +87,11 @@ class ServiceProvider extends BaseServiceProvider implements DeferrableProvider
 
         // Support both Breadcrumbs:: and $breadcrumbs-> syntax by making $breadcrumbs variable available
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $breadcrumbs = $this->app->make(Manager::class);
+        // $breadcrumbs = $this->app->make(Manager::class);
 
-        // Support both a single string filename and an array of filenames (e.g. returned by glob())
-        foreach ((array)$files as $file) {
-            require $file;
-        }
+        // // Support both a single string filename and an array of filenames (e.g. returned by glob())
+        // foreach ((array)$files as $file) {
+        //     require $file;
+        // }
     }
 }
